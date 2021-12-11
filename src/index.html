@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="phaser/dist/phaser.js"></script> -->
+    <!-- I started developing with the Phaser 3 downloaded version, but it was too big to submit in an email.
+            Hopefully it still works after switching to the web reference. -->
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55/dist/phaser.min.js"></script>
+    <script src="classes/Hexagon.js"></script>
+    <script src="classes/Dot.js"></script>
+    <script src="classes/SelectedStack.js"></script>
+    <script src="scenes/GameScene.js"></script>
+    <title>Hex Dots Game</title>
+    <style>
+        canvas {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <script type="text/javascript">
+
+        const boardsize = 6;
+        const colorCount = 5;
+        const hexWidth = 62;
+        const hexHeight = 70;
+        const showHexes = true;
+
+        let gameScene = new GameScene('Game', boardsize, colorCount, hexWidth, hexHeight, showHexes);
+
+        var config = {
+                type: Phaser.AUTO,
+                width: 600,
+            height: 600,
+            pixelArt: false,
+            pixelArt: false,
+            border: true,
+            scene: [gameScene],
+                backgroundColor: '#fff'
+            };
+        
+        
+        var game = new Phaser.Game(config);
+        game.scene.start('Game');
+
+    </script>
+    
+</body>
+</html>
