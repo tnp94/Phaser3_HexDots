@@ -8,6 +8,7 @@ class GameScene extends Phaser.Scene{
         this.hexWidth = hexWidth;
         this.hexHeight = hexHeight;
         this.showHexes = showHexes;
+        this.score = 0;
     }
     
     RandomColor(colorCount) {
@@ -46,21 +47,25 @@ class GameScene extends Phaser.Scene{
 
     create()
     {
+        this.scoreText = this.add.text(16, 16, "Score: 0", { fontSize: '32px', fill: '#000' });
         let thisScene = this;
         this.selectedStack = new SelectedStack(this);
         this.clearColor = function (gameboard, color) {
+            let score = 0;
             for (let i in gameboard) {
                 let row = gameboard[i];
                 for (let j in row) {
                     let dot = row[j].dot;
                     if (dot && dot.color === color) {
                         dot.popDot();
+                        score += 1;
                     }
                 }
             }
+            return score;
         }
-        this.boardoffsetX = (this.sys.game.config.width / 2) - (hexWidth * boardsize ) / 2;
-        this.boardoffsetY = (this.sys.game.config.height / 2) - (hexHeight * boardsize ) / 2;
+        this.boardoffsetX = (this.sys.game.config.width / 2) - ((hexWidth * boardsize ) / 2);
+        this.boardoffsetY = (this.sys.game.config.height / 2) - ((hexHeight * boardsize ) / 2);
         this.input.on('pointerup', function (pointer) {
             // function to clear selected and give points
             let score = thisScene.selectedStack.scoreStack();
@@ -78,7 +83,7 @@ class GameScene extends Phaser.Scene{
             for (let j = 0; j < boardsize; j++)
             {
                 let color = this.RandomColor(colorCount)
-                let dot = new Dot(gameScene, (j*hexWidth) + (i % 2 * (hexWidth / 2)) + this.boardoffsetX, (i * (2*hexHeight / 3)) + this.boardoffsetY, 15, color, i, j).setInteractive();
+                let dot = new Dot(gameScene, (j*hexWidth) + (i % 2 * (hexWidth / 2)) + this.boardoffsetX, (i * (2 * hexHeight / 3)) + this.boardoffsetY, 15, color, i, j).setInteractive();
                 gamerow[j] = {};
                 gamerow[j].dot = dot;
                 gamerow[j].positionX = (j * hexWidth) + (i % 2 * (hexWidth / 2)) + this.boardoffsetX;
@@ -159,5 +164,23 @@ class GameScene extends Phaser.Scene{
                 }
             }
         }
+    }
+
+    select(x, y) {
+        this.selectedStack.stack.push(this.gameboard[x][y].dot);
+    }
+    
+    pop() {
+        this.selectedStack.stack.pop();
+    }
+
+    score() {
+        this.selectedStack.scoreStack();
+        this.refresh();
+    }
+
+    refresh() {
+        this.fallDots();
+        this.refillDots();
     }
 }
