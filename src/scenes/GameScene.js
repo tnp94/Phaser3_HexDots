@@ -3,8 +3,8 @@ class GameScene extends Phaser.Scene{
     constructor(game, boardSize, colorCount, hexWidth, hexHeight, showHexes) {
         super(game);
         this.colorList = [0x0, 0xf2f200, 0xdd2222, 0x33aa33, 0x3333aa, 0xffaaaa, 0x33ffff]
-        this.boardSize = boardSize;
-        this.colorCount = colorCount;
+        this.colorCount = Math.min(colorCount, this.colorList.length);
+        this.boardsize = Math.min(boardSize, 11);
         this.hexWidth = hexWidth;
         this.hexHeight = hexHeight;
         this.showHexes = showHexes;
@@ -64,23 +64,25 @@ class GameScene extends Phaser.Scene{
             }
             return score;
         }
-        this.boardoffsetX = (this.sys.game.config.width / 2) - ((hexWidth * boardsize ) / 2);
-        this.boardoffsetY = (this.sys.game.config.height / 2) - ((hexHeight * boardsize ) / 2);
+        this.boardoffsetX = (this.sys.game.config.width / 2) - ((hexWidth * this.boardsize ) / 2);
+        this.boardoffsetY = (this.sys.game.config.height / 2) - (hexHeight*2/3 * (this.boardsize-1)/2);
         this.input.on('pointerup', function (pointer) {
             // function to clear selected and give points
             let score = thisScene.selectedStack.scoreStack();
             if (score.loop) {
-                thisScene.clearColor(thisScene.gameboard, thisScene.selectedStack.currentColor);
+                score.points += thisScene.clearColor(thisScene.gameboard, thisScene.selectedStack.currentColor);
             }
+            thisScene.score += score.points**2;
+            thisScene.scoreText.setText(`Score: ${thisScene.score}`);
             thisScene.fallDots();
             thisScene.refillDots();
             console.log(score.points, score.loop)
         });
         this.gameboard = [];
-        for (let i = 0; i < boardsize; i++)
+        for (let i = 0; i < this.boardsize; i++)
         {
             let gamerow = [];
-            for (let j = 0; j < boardsize; j++)
+            for (let j = 0; j < this.boardsize; j++)
             {
                 let color = this.RandomColor(colorCount)
                 let dot = new Dot(gameScene, (j*hexWidth) + (i % 2 * (hexWidth / 2)) + this.boardoffsetX, (i * (2 * hexHeight / 3)) + this.boardoffsetY, 15, color, i, j).setInteractive();
@@ -102,10 +104,10 @@ class GameScene extends Phaser.Scene{
         let graphics = this.add.graphics();
         graphics.depth = -1;
         graphics.lineStyle(1, 0x333333, 1);
-        for (let c = 0; c < boardsize; c++) {
+        for (let c = 0; c < this.boardsize; c++) {
             let path = new Phaser.Curves.Path(this.gameboard[0][c].positionX, this.gameboard[0][c].positionY);
             let columnPoints = [];
-            for (let r = 0; r < boardsize; r++) {
+            for (let r = 0; r < this.boardsize; r++) {
                 let columnPoint = {};
                 columnPoint.x = this.gameboard[r][c].positionX;
                 columnPoint.y = this.gameboard[r][c].positionY;
@@ -125,9 +127,9 @@ class GameScene extends Phaser.Scene{
     
     fallDots() {
         let gameboard = this.gameboard;
-        for (let i = boardsize - 1; i >= 0; i--) {
+        for (let i = this.boardsize - 1; i >= 0; i--) {
             let row = gameboard[i];
-            for (let j = boardsize - 1; j >= 0; j--) {
+            for (let j = this.boardsize - 1; j >= 0; j--) {
                 let dot = row[j].dot;
                 // Start at row above me
                 // Check if dot is in the same column
@@ -153,9 +155,9 @@ class GameScene extends Phaser.Scene{
 
     refillDots() {
         let gameboard = this.gameboard;
-        for (let i = boardsize - 1; i >= 0; i--) {
+        for (let i = this.boardsize - 1; i >= 0; i--) {
             let row = gameboard[i];
-            for (let j = boardsize - 1; j >= 0; j--) {
+            for (let j = this.boardsize - 1; j >= 0; j--) {
                 let dot = row[j].dot;
                 if (dot == null) {
                     let color = this.RandomColor(colorCount)
