@@ -64,19 +64,21 @@ class GameScene extends Phaser.Scene{
             }
             return score;
         }
-        this.boardoffsetX = (this.sys.game.config.width / 2) - ((hexWidth * this.boardsize ) / 2);
-        this.boardoffsetY = (this.sys.game.config.height / 2) - (hexHeight*2/3 * (this.boardsize-1)/2);
+        this.boardoffsetX = (this.sys.game.config.width / 2) - ((this.hexWidth * this.boardsize ) / 2);
+        this.boardoffsetY = (this.sys.game.config.height / 2) - (this.hexHeight*2/3 * (this.boardsize-1)/2);
         this.input.on('pointerup', function (pointer) {
             // function to clear selected and give points
             let score = thisScene.selectedStack.scoreStack();
-            if (score.loop) {
-                score.points += thisScene.clearColor(thisScene.gameboard, thisScene.selectedStack.currentColor);
-            }
             thisScene.score += score.points**2;
+            let loopScore = 0
+            if (score.loop) {
+                loopScore = thisScene.clearColor(thisScene.gameboard, thisScene.selectedStack.currentColor);
+                thisScene.score += loopScore;
+            }
             thisScene.scoreText.setText(`Score: ${thisScene.score}`);
             thisScene.fallDots();
             thisScene.refillDots();
-            console.log(score.points, score.loop)
+            console.log(score.points**2, loopScore)
         });
         this.gameboard = [];
         for (let i = 0; i < this.boardsize; i++)
@@ -84,12 +86,12 @@ class GameScene extends Phaser.Scene{
             let gamerow = [];
             for (let j = 0; j < this.boardsize; j++)
             {
-                let color = this.RandomColor(colorCount)
-                let dot = new Dot(gameScene, (j*hexWidth) + (i % 2 * (hexWidth / 2)) + this.boardoffsetX, (i * (2 * hexHeight / 3)) + this.boardoffsetY, 15, color, i, j).setInteractive();
+                let color = this.RandomColor(this.colorCount)
+                let dot = new Dot(this, (j*this.hexWidth) + (i % 2 * (this.hexWidth / 2)) + this.boardoffsetX, (i * (2 * this.hexHeight / 3)) + this.boardoffsetY, 15, color, i, j).setInteractive();
                 gamerow[j] = {};
                 gamerow[j].dot = dot;
-                gamerow[j].positionX = (j * hexWidth) + (i % 2 * (hexWidth / 2)) + this.boardoffsetX;
-                gamerow[j].positionY = (i * (2 * hexHeight / 3)) + this.boardoffsetY;
+                gamerow[j].positionX = (j * this.hexWidth) + (i % 2 * (this.hexWidth / 2)) + this.boardoffsetX;
+                gamerow[j].positionY = (i * (2 * this.hexHeight / 3)) + this.boardoffsetY;
                 if (this.showHexes)
                 {
                     gamerow[j].hex = this.add.image(gamerow[j].positionX, gamerow[j].positionY, 'hexagon');
@@ -141,8 +143,8 @@ class GameScene extends Phaser.Scene{
                     gameboard[victimRow][j].dot = null;
                     if (victimDot != null) {
                         dot = victimDot;
-                        let y = (i * (2 * hexHeight / 3)) + this.boardoffsetY;
-                        let x = (j * hexWidth) + (i % 2 * (hexWidth / 2)) + this.boardoffsetX;
+                        let y = (i * (2 * this.hexHeight / 3)) + this.boardoffsetY;
+                        let x = (j * this.hexWidth) + (i % 2 * (this.hexWidth / 2)) + this.boardoffsetX;
                         dot.fall(i, this.columnPoints)
                         row[j].dot = dot;
                     }
@@ -160,8 +162,8 @@ class GameScene extends Phaser.Scene{
             for (let j = this.boardsize - 1; j >= 0; j--) {
                 let dot = row[j].dot;
                 if (dot == null) {
-                    let color = this.RandomColor(colorCount)
-                    let dot = new Dot(gameScene, (j * hexWidth) + (i % 2 * (hexWidth / 2)) + this.boardoffsetX, (i * (2 * hexHeight / 3)) + this.boardoffsetY, 15, color, i, j).setInteractive();
+                    let color = this.RandomColor(this.colorCount)
+                    let dot = new Dot(this, (j * this.hexWidth) + (i % 2 * (this.hexWidth / 2)) + this.boardoffsetX, (i * (2 * this.hexHeight / 3)) + this.boardoffsetY, 15, color, i, j).setInteractive();
                     row[j].dot = dot;
                 }
             }
